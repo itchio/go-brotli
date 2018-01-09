@@ -2,25 +2,28 @@
 package dec // import "gopkg.in/kothar/brotli-go.v0/dec"
 
 /*
-#include "./decode.h"
+#cgo CFLAGS: -I${SRCDIR}/../include
 
-typedef uint8_t dict[122784];
-dict* decodeBrotliDictionary;
+#include <brotli/decode.h>
+
+void *decodeBrotliDictionary;
 
 // Wrap the C method to avoid modifying pointers in Go-allocated memory
-BrotliResult BrotliDecompressStream_Wrapper(
+BrotliDecoderResult BrotliDecoderDecompressStream_Wrapper(
+	BrotliDecoderState* s,
 	size_t* available_in, const uint8_t* input,
 	size_t* available_out, uint8_t* output,
-    size_t* total_out, BrotliState* s
+    size_t* total_out
 ) {
 	// Make copy of nextOut to avoid leaking back to Go
 	const uint8_t* next_in = input;
 	uint8_t* next_out = output;
 
-	return BrotliDecompressStream(
+	return BrotliDecoderDecompressStream(
+		s,
 		available_in, &next_in,
 		available_out, &next_out,
-		total_out, s
+		total_out
 	);
 }
 
@@ -33,12 +36,12 @@ import (
 	"runtime"
 	"unsafe"
 
-	"gopkg.in/kothar/brotli-go.v0/shared"
+	"gopkg.in/kothar/brotli-go.v0/common"
 )
 
 func init() {
 	// Set up the default dictionary from the data in the shared package
-	C.decodeBrotliDictionary = (*C.dict)(shared.GetDictionary())
+	C.decodeBrotliDictionary = unsafe.Pointer(common.GetDictionary())
 }
 
 // DecompressBuffer decompress a Brotli-encoded buffer. Uses decodedBuffer as the destination buffer unless it is too small,
@@ -46,83 +49,26 @@ func init() {
 // Returns the slice of the decodedBuffer containing the output, or an error.
 func DecompressBuffer(encodedBuffer []byte, decodedBuffer []byte) ([]byte, error) {
 	encodedLength := len(encodedBuffer)
-	var decodedSize C.size_t
 
-	// If the user has provided a sensibly size buffer, assume they know how long the output should be
-	// Otherwise try to determine the correct length from the input
-	if len(decodedBuffer) < len(encodedBuffer) {
-		success := C.BrotliDecompressedSize(C.size_t(encodedLength), toC(encodedBuffer), &decodedSize)
-		if success != 1 {
-			// We can't know in advance how much buffer to allocate, so we will just have to guess
-			decodedSize = C.size_t(len(encodedBuffer) * 6)
-		}
-
-		if len(decodedBuffer) < int(decodedSize) {
-			decodedBuffer = make([]byte, decodedSize)
-		}
+	if decodedBuffer == nil {
+		// We can't know in advance how much buffer to allocate, so we will just have to guess
+		decodedBuffer = make([]byte, len(encodedBuffer)*6)
 	}
 
 	// The size of the ouput buffer available
 	decodedLength := C.size_t(len(decodedBuffer))
-	result := C.BrotliDecompressBuffer(C.size_t(encodedLength), toC(encodedBuffer), &decodedLength, toC(decodedBuffer))
+	result := C.BrotliDecoderDecompress(C.size_t(encodedLength), toC(encodedBuffer), &decodedLength, toC(decodedBuffer))
 	switch result {
-	case C.BROTLI_RESULT_SUCCESS:
+	case C.BROTLI_DECODER_RESULT_SUCCESS:
 		// We're finished
 		return decodedBuffer[0:decodedLength], nil
-	case C.BROTLI_RESULT_NEEDS_MORE_OUTPUT:
+	case C.BROTLI_DECODER_RESULT_NEEDS_MORE_OUTPUT:
 		// We needed more output buffer
 		decodedBuffer = make([]byte, len(decodedBuffer)*2)
 		return DecompressBuffer(encodedBuffer, decodedBuffer)
-	case C.BROTLI_RESULT_ERROR:
+	case C.BROTLI_DECODER_RESULT_ERROR:
 		return nil, errors.New("Brotli decompression error")
-	case C.BROTLI_RESULT_NEEDS_MORE_INPUT:
-		// We can't handle streaming more input results here
-		return nil, errors.New("Brotli decompression error: needs more input")
-	default:
-		return nil, errors.New("Unrecognised Brotli decompression error")
-	}
-}
-
-// DecompressBufferDict decompress a Brotli-encoded buffer. Uses decodedBuffer as the destination buffer unless it is too small,
-// in which case a new buffer is allocated.
-// Returns the slice of the decodedBuffer containing the output, or an error.
-func DecompressBufferDict(encodedBuffer []byte, inputDict []byte, decodedBuffer []byte) ([]byte, error) {
-	encodedLength := len(encodedBuffer)
-	dictLength := len(inputDict)
-	var decodedSize C.size_t
-
-	// If the user has provided a sensibly size buffer, assume they know how long the output should be
-	// Otherwise try to determine the correct length from the input
-	if len(decodedBuffer) < len(encodedBuffer) {
-		success := C.BrotliDecompressedSize(C.size_t(encodedLength), toC(encodedBuffer), &decodedSize)
-		if success != 1 {
-			// We can't know in advance how much buffer to allocate, so we will just have to guess
-			decodedSize = C.size_t(len(encodedBuffer) * 6)
-		}
-
-		if len(decodedBuffer) < int(decodedSize) {
-			decodedBuffer = make([]byte, decodedSize)
-		}
-	}
-
-	// The size of the ouput buffer available
-	decodedLength := C.size_t(len(decodedBuffer))
-
-	result := C.BrotliDecompressBufferDict(
-		C.size_t(encodedLength), toC(encodedBuffer),
-		C.size_t(dictLength), toC(inputDict),
-		&decodedLength, toC(decodedBuffer))
-	switch result {
-	case C.BROTLI_RESULT_SUCCESS:
-		// We're finished
-		return decodedBuffer[0:decodedLength], nil
-	case C.BROTLI_RESULT_NEEDS_MORE_OUTPUT:
-		// We needed more output buffer
-		decodedBuffer = make([]byte, len(decodedBuffer)*2)
-		return DecompressBufferDict(encodedBuffer, inputDict, decodedBuffer)
-	case C.BROTLI_RESULT_ERROR:
-		return nil, errors.New("Brotli decompression error")
-	case C.BROTLI_RESULT_NEEDS_MORE_INPUT:
+	case C.BROTLI_DECODER_RESULT_NEEDS_MORE_INPUT:
 		// We can't handle streaming more input results here
 		return nil, errors.New("Brotli decompression error: needs more input")
 	default:
@@ -187,29 +133,29 @@ func (r *BrotliReader) Read(p []byte) (n int, err error) {
 			if r.availableIn > 0 {
 				nextIn = unsafe.Pointer(&r.buffer[inputPosition])
 			}
-			result := C.BrotliDecompressStream_Wrapper(
+			result := C.BrotliDecoderDecompressStream_Wrapper(
+				(*C.BrotliDecoderState)(r.state),
 				&r.availableIn,
 				(*C.uint8_t)(nextIn),
 				&availableOut,
 				(*C.uint8_t)(unsafe.Pointer(&p[0])),
 				&r.totalOut,
-				(*C.BrotliState)(r.state),
 			)
 
 			n = maxOutput - int(availableOut)
 
 			switch result {
-			case C.BROTLI_RESULT_SUCCESS:
+			case C.BROTLI_DECODER_RESULT_SUCCESS:
 				r.err = io.EOF
-			case C.BROTLI_RESULT_NEEDS_MORE_OUTPUT:
+			case C.BROTLI_DECODER_RESULT_NEEDS_MORE_OUTPUT:
 				r.needOutput = true
 				if n > 0 {
 					return n, r.err
 				}
 				r.err = errors.New("Brotli decompression error: needs more output buffer")
-			case C.BROTLI_RESULT_ERROR:
+			case C.BROTLI_DECODER_RESULT_ERROR:
 				r.err = errors.New("Brotli decompression error")
-			case C.BROTLI_RESULT_NEEDS_MORE_INPUT:
+			case C.BROTLI_DECODER_RESULT_NEEDS_MORE_INPUT:
 				r.needOutput = false
 			default:
 				r.err = errors.New("Unrecognized Brotli decompression error")
@@ -228,8 +174,7 @@ func (r *BrotliReader) Close() error {
 	if r.closed {
 		return r.err
 	}
-	C.BrotliStateCleanup((*C.BrotliState)(r.state))
-	C.BrotliDestroyState((*C.BrotliState)(r.state))
+	C.BrotliDecoderDestroyInstance((*C.BrotliDecoderState)(r.state))
 	r.closed = true
 	if r.err == nil || r.err == io.EOF {
 		r.err = io.ErrClosedPipe // Make sure future operations fail
@@ -258,9 +203,7 @@ func NewBrotliReaderSize(stream io.Reader, size int) *BrotliReader {
 		buffer: make([]byte, size),
 	}
 
-	r.state = unsafe.Pointer(C.BrotliCreateState(nil, nil, nil))
-	C.BrotliStateInit((*C.BrotliState)(r.state))
-
+	r.state = unsafe.Pointer(C.BrotliDecoderCreateInstance(nil, nil, nil))
 	runtime.SetFinalizer(r, func(c io.Closer) { c.Close() })
 
 	return r

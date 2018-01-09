@@ -4,36 +4,36 @@
    See file LICENSE for detail or copy at https://opensource.org/licenses/MIT
 */
 
-// Function to find backward reference copies.
+/* Function to find backward reference copies. */
 
 #ifndef BROTLI_ENC_BACKWARD_REFERENCES_H_
 #define BROTLI_ENC_BACKWARD_REFERENCES_H_
 
-#include "./hash.h"
+#include "../common/constants.h"
+#include "../common/dictionary.h"
+#include "../common/platform.h"
+#include <brotli/types.h>
 #include "./command.h"
-#include "./types.h"
+#include "./hash.h"
+#include "./quality.h"
 
-namespace brotli {
+#if defined(__cplusplus) || defined(c_plusplus)
+extern "C" {
+#endif
 
-// "commands" points to the next output command to write to, "*num_commands" is
-// initially the total amount of commands output by previous
-// CreateBackwardReferences calls, and must be incremented by the amount written
-// by this call.
-void CreateBackwardReferences(size_t num_bytes,
-                              size_t position,
-                              bool is_last,
-                              const uint8_t* ringbuffer,
-                              size_t ringbuffer_mask,
-                              const int quality,
-                              const int lgwin,
-                              Hashers* hashers,
-                              int hash_type,
-                              int* dist_cache,
-                              size_t* last_insert_len,
-                              Command* commands,
-                              size_t* num_commands,
-                              size_t* num_literals);
+/* "commands" points to the next output command to write to, "*num_commands" is
+   initially the total amount of commands output by previous
+   CreateBackwardReferences calls, and must be incremented by the amount written
+   by this call. */
+BROTLI_INTERNAL void BrotliCreateBackwardReferences(
+    const BrotliDictionary* dictionary,
+    size_t num_bytes, size_t position, const uint8_t* ringbuffer,
+    size_t ringbuffer_mask, const BrotliEncoderParams* params,
+    HasherHandle hasher, int* dist_cache, size_t* last_insert_len,
+    Command* commands, size_t* num_commands, size_t* num_literals);
 
-}  // namespace brotli
+#if defined(__cplusplus) || defined(c_plusplus)
+}  /* extern "C" */
+#endif
 
-#endif  // BROTLI_ENC_BACKWARD_REFERENCES_H_
+#endif  /* BROTLI_ENC_BACKWARD_REFERENCES_H_ */

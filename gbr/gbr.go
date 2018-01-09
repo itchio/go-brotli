@@ -44,9 +44,9 @@ func main() {
 	// Perform compression or decompression
 	var outputData []byte
 	if compress != "" {
-		params := enc.NewBrotliParams()
-		params.SetQuality(quality)
-		outputData, err = enc.CompressBuffer(params, inputData, nil)
+		outputData, err = enc.CompressBuffer(inputData, &enc.BrotliWriterOptions{
+			Quality: quality,
+		})
 	} else if decompress != "" {
 		outputData, err = dec.DecompressBuffer(inputData, nil)
 	}

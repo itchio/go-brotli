@@ -9,35 +9,35 @@
 #ifndef BROTLI_DEC_TRANSFORM_H_
 #define BROTLI_DEC_TRANSFORM_H_
 
-#include "./port.h"
-#include "./types.h"
+#include "../common/platform.h"
+#include <brotli/types.h>
 
 #if defined(__cplusplus) || defined(c_plusplus)
 extern "C" {
 #endif
 
 enum WordTransformType {
-  kIdentity       = 0,
-  kOmitLast1      = 1,
-  kOmitLast2      = 2,
-  kOmitLast3      = 3,
-  kOmitLast4      = 4,
-  kOmitLast5      = 5,
-  kOmitLast6      = 6,
-  kOmitLast7      = 7,
-  kOmitLast8      = 8,
-  kOmitLast9      = 9,
+  kIdentity = 0,
+  kOmitLast1 = 1,
+  kOmitLast2 = 2,
+  kOmitLast3 = 3,
+  kOmitLast4 = 4,
+  kOmitLast5 = 5,
+  kOmitLast6 = 6,
+  kOmitLast7 = 7,
+  kOmitLast8 = 8,
+  kOmitLast9 = 9,
   kUppercaseFirst = 10,
-  kUppercaseAll   = 11,
-  kOmitFirst1     = 12,
-  kOmitFirst2     = 13,
-  kOmitFirst3     = 14,
-  kOmitFirst4     = 15,
-  kOmitFirst5     = 16,
-  kOmitFirst6     = 17,
-  kOmitFirst7     = 18,
-  kOmitFirst8     = 19,
-  kOmitFirst9     = 20
+  kUppercaseAll = 11,
+  kOmitFirst1 = 12,
+  kOmitFirst2 = 13,
+  kOmitFirst3 = 14,
+  kOmitFirst4 = 15,
+  kOmitFirst5 = 16,
+  kOmitFirst6 = 17,
+  kOmitFirst7 = 18,
+  kOmitFirst8 = 19,
+  kOmitFirst9 = 20
 };
 
 typedef struct {
@@ -66,15 +66,15 @@ enum {
   kPFix_SP = 1,
   kPFix_COMMASP = 3,
   kPFix_SPofSPtheSP = 6,
-  kPFix_SPtheSP  = 9,
+  kPFix_SPtheSP = 9,
   kPFix_eSP = 12,
-  kPFix_SPofSP  = 15,
+  kPFix_SPofSP = 15,
   kPFix_sSP = 20,
   kPFix_DOT = 23,
   kPFix_SPandSP = 25,
   kPFix_SPinSP = 31,
   kPFix_DQUOT = 36,
-  kPFix_SPtoSP  = 38,
+  kPFix_SPtoSP = 38,
   kPFix_DQUOTGT = 43,
   kPFix_NEWLINE = 46,
   kPFix_DOTSP = 48,
@@ -84,20 +84,20 @@ enum {
   kPFix_SPthatSP = 63,
   kPFix_SQUOT = 70,
   kPFix_SPwithSP = 72,
-  kPFix_SPfromSP  = 79,
-  kPFix_SPbySP  = 86,
+  kPFix_SPfromSP = 79,
+  kPFix_SPbySP = 86,
   kPFix_OPEN = 91,
   kPFix_DOTSPTheSP = 93,
-  kPFix_SPonSP  = 100,
-  kPFix_SPasSP  = 105,
-  kPFix_SPisSP  = 110,
+  kPFix_SPonSP = 100,
+  kPFix_SPasSP = 105,
+  kPFix_SPisSP = 110,
   kPFix_ingSP = 115,
   kPFix_NEWLINETAB = 120,
   kPFix_COLON = 123,
   kPFix_edSP = 125,
   kPFix_EQDQUOT = 129,
   kPFix_SPatSP = 132,
-  kPFix_lySP  = 137,
+  kPFix_lySP = 137,
   kPFix_COMMA = 141,
   kPFix_EQSQUOT = 143,
   kPFix_DOTcomSLASH = 146,
@@ -113,7 +113,6 @@ enum {
   kPFix_NBSP = 200,
   kPFix_ousSP = 203
 };
-
 
 static const Transform kTransforms[] = {
   { kPFix_EMPTY, kIdentity, kPFix_EMPTY },
@@ -241,14 +240,14 @@ static const Transform kTransforms[] = {
 
 static const int kNumTransforms = sizeof(kTransforms) / sizeof(kTransforms[0]);
 
-static int ToUpperCase(uint8_t *p) {
+static int ToUpperCase(uint8_t* p) {
   if (p[0] < 0xc0) {
     if (p[0] >= 'a' && p[0] <= 'z') {
       p[0] ^= 32;
     }
     return 1;
   }
-  /* An overly simplified uppercasing model for utf-8. */
+  /* An overly simplified uppercasing model for UTF-8. */
   if (p[0] < 0xe0) {
     p[1] ^= 32;
     return 2;
@@ -258,7 +257,7 @@ static int ToUpperCase(uint8_t *p) {
   return 3;
 }
 
-static BROTLI_NOINLINE int TransformDictionaryWord(
+static BROTLI_NOINLINE int BrotliTransformDictionaryWord(
     uint8_t* dst, const uint8_t* word, int len, int transform) {
   int idx = 0;
   {
@@ -295,7 +294,7 @@ static BROTLI_NOINLINE int TransformDictionaryWord(
 }
 
 #if defined(__cplusplus) || defined(c_plusplus)
-}    /* extern "C" */
+}  /* extern "C" */
 #endif
 
 #endif  /* BROTLI_DEC_TRANSFORM_H_ */

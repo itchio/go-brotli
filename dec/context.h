@@ -99,13 +99,13 @@
 #ifndef BROTLI_DEC_CONTEXT_H_
 #define BROTLI_DEC_CONTEXT_H_
 
-#include "./types.h"
+#include <brotli/types.h>
 
 enum ContextType {
-  CONTEXT_LSB6         = 0,
-  CONTEXT_MSB6         = 1,
-  CONTEXT_UTF8         = 2,
-  CONTEXT_SIGNED       = 3
+  CONTEXT_LSB6 = 0,
+  CONTEXT_MSB6 = 1,
+  CONTEXT_UTF8 = 2,
+  CONTEXT_SIGNED = 3
 };
 
 /* Common context lookup table for all context modes. */

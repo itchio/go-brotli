@@ -15,11 +15,9 @@ func TestStreamDecompression(T *testing.T) {
 
 	input1 := bytes.Repeat([]byte("The quick brown fox jumps over the lazy dog. "), 100000)
 
-	output1 := make([]byte, len(input1)*2)
-	params := enc.NewBrotliParams()
-	params.SetQuality(4)
-
-	_, err := enc.CompressBuffer(params, input1, output1)
+	output1, err := enc.CompressBuffer(input1, &enc.BrotliWriterOptions{
+		Quality: 4,
+	})
 	if err != nil {
 		T.Fatal(err)
 	}
@@ -117,10 +115,9 @@ func TestEOFBehavior(T *testing.T) {
 	input := []byte{1, 2, 3, 4}
 	output := make([]byte, len(input)*12)
 
-	params := enc.NewBrotliParams()
-	params.SetQuality(4)
-
-	output, err := enc.CompressBuffer(params, input, output)
+	output, err := enc.CompressBuffer(input, &enc.BrotliWriterOptions{
+		Quality: 4,
+	})
 	if err != nil {
 		T.Fatal(err)
 	}

@@ -3,4 +3,4 @@ Brotli Version
 
 Vendored Brotli implementation from https://github.com/google/brotli
 
-Current upstream commit: `33aa40220b96cf95ad2b9ba61dc8d7fd2f964f2c`
+Current upstream commit: `da254cffdb160bd6ac1cd6ea01944099978cbb71`

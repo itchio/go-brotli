@@ -9,13 +9,13 @@
 package brotli // import "gopkg.in/kothar/brotli-go.v0"
 
 import (
+	"gopkg.in/kothar/brotli-go.v0/common"
 	"gopkg.in/kothar/brotli-go.v0/dec"
 	"gopkg.in/kothar/brotli-go.v0/enc"
-	"gopkg.in/kothar/brotli-go.v0/shared"
 )
 
 var (
 	_ = enc.CompressBuffer
 	_ = dec.DecompressBuffer
-	_ = shared.GetDictionary
+	_ = common.GetDictionary
 )
