@@ -1,5 +1,5 @@
 // Package dec provides Brotli decoder bindings
-package dec // import "gopkg.in/kothar/brotli-go.v0/dec"
+package dec // import "github.com/itchio/go-brotli/dec"
 
 /*
 #cgo CFLAGS: -I${SRCDIR}/../include
@@ -36,7 +36,7 @@ import (
 	"runtime"
 	"unsafe"
 
-	"gopkg.in/kothar/brotli-go.v0/common"
+	"github.com/itchio/go-brotli/common"
 )
 
 func init() {

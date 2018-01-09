@@ -60,7 +60,7 @@ matrix:
            - binutils-mingw-w64-x86-64
 before_install:
   # our 'canonical import path' is gopkg.in-based, not github.com, cf. #17
-  - export BROTLI_CANONICAL_IMPORT=${GOPATH}/src/gopkg.in/kothar/brotli-go.v0
+  - export BROTLI_CANONICAL_IMPORT=${GOPATH}/src/github.com/itchio/go-brotli
   - mkdir -p ${BROTLI_CANONICAL_IMPORT}
   - rsync -az ${TRAVIS_BUILD_DIR}/ ${BROTLI_CANONICAL_IMPORT}/
   - cd ${BROTLI_CANONICAL_IMPORT}

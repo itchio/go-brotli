@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 
-	"gopkg.in/kothar/brotli-go.v0/dec"
-	"gopkg.in/kothar/brotli-go.v0/enc"
+	"github.com/itchio/go-brotli/dec"
+	"github.com/itchio/go-brotli/enc"
 )
 
 // Flags

@@ -1,6 +1,6 @@
 # Go bindings for the Brotli compression library
 
-[![GoDoc](https://godoc.org/gopkg.in/kothar/brotli-go.v0?status.svg)](https://godoc.org/gopkg.in/kothar/brotli-go.v0)
+[![GoDoc](https://godoc.org/github.com/itchio/go-brotli?status.svg)](https://godoc.org/github.com/itchio/go-brotli)
 [![Build Status](https://travis-ci.org/kothar/brotli-go.svg)](https://travis-ci.org/kothar/brotli-go)
 
 See <https://github.com/google/brotli> for the upstream C/C++ source, and
@@ -16,8 +16,8 @@ Naive compression + decompression example with no error handling:
 
 ```go
 import (
-	"gopkg.in/kothar/brotli-go.v0/dec"
-	"gopkg.in/kothar/brotli-go.v0/enc"
+	"github.com/itchio/go-brotli/dec"
+	"github.com/itchio/go-brotli/enc"
 )
 
 func brotliRoundtrip(input []byte) []byte {
@@ -36,7 +36,7 @@ as `quality`, `lgwin` (sliding window size), and `lgblock` (input block size).
 
 ```go
 import (
-	"gopkg.in/kothar/brotli-go.v0/enc"
+	"github.com/itchio/go-brotli/enc"
 )
 
 func brotliFastCompress(input []byte) []byte {
@@ -59,7 +59,7 @@ When the data set is too large to fit in-memory, `CompressBuffer` and
 
 ```go
 import (
-	"gopkg.in/kothar/brotli-go.v0/enc"
+	"github.com/itchio/go-brotli/enc"
 )
 
 func main() {
@@ -80,7 +80,7 @@ func main() {
 
 ```go
 import (
-	"gopkg.in/kothar/brotli-go.v0/dec"
+	"github.com/itchio/go-brotli/dec"
 )
 
 func main() {

@@ -8,7 +8,7 @@ import (
 	"runtime"
 	"testing"
 
-	"gopkg.in/kothar/brotli-go.v0/enc"
+	"github.com/itchio/go-brotli/enc"
 )
 
 func TestStreamDecompression(T *testing.T) {

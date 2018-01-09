@@ -1,5 +1,5 @@
 // Package common contains the common dictionary used by the enc and dec packages
-package common // import "gopkg.in/kothar/brotli-go.v0/common"
+package common // import "github.com/itchio/go-brotli/common"
 
 /*
 #cgo CFLAGS: -I${SRCDIR}/../include
