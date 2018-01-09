@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func ExampleBrotliParams() {
+func ExampleBrotliWriterOptions() {
 	var input []byte
 
 	compressed, _ := CompressBuffer(input, &BrotliWriterOptions{

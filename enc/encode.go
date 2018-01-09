@@ -3,6 +3,7 @@ package enc // import "github.com/itchio/go-brotli/enc"
 
 /*
 #cgo CFLAGS: -I${SRCDIR}/../include
+#cgo LDFLAGS: -lm
 
 // for memcpy
 #include <string.h>
@@ -71,6 +72,9 @@ type BrotliWriterOptions struct {
 	LGWin int
 }
 
+// CompressBuffer compresses a single block of data.
+// Default options are used if options is nil.
+// Returns the brotli-compressed version of the data, or an error.
 func CompressBuffer(input []byte, options *BrotliWriterOptions) ([]byte, error) {
 	buf := new(bytes.Buffer)
 	w := NewBrotliWriter(buf, options)
