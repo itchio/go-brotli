@@ -1,116 +1,41 @@
 # Go bindings for the Brotli compression library
 
 [![GoDoc](https://godoc.org/github.com/itchio/go-brotli?status.svg)](https://godoc.org/github.com/itchio/go-brotli)
-[![Build Status](https://travis-ci.org/kothar/brotli-go.svg)](https://travis-ci.org/kothar/brotli-go)
+[![Build Status](https://travis-ci.org/itchio/go-brotli.svg)](https://travis-ci.org/itchio/go-brotli)
+
+This is a fork of Mike Houston's <https://github.com/kothar/brotli-go> with
+the following changes:
+
+  * Bumped to a more recent upstream (post-1.0.0)
+  * Removed custom dictionary support (which was removed from upstream)
 
 See <https://github.com/google/brotli> for the upstream C/C++ source, and
 the `VERSION.md` file to find out the currently vendored version.
 
-Usage
----
+### Usage
 
-To use the bindings, you just need to import the enc or dec package and call the Go wrapper
-functions `enc.CompressBuffer` or `dec.DecompressBuffer`
+Instead of including potentially-outdated examples in the README, 
+please refer to the `Examples` tests on the following godoc pages:
 
-Naive compression + decompression example with no error handling:
+  * Decompression: <https://godoc.org/github.com/itchio/go-brotli/dec>
+  * Compression: <https://godoc.org/github.com/itchio/go-brotli/enc>
 
-```go
-import (
-	"github.com/itchio/go-brotli/dec"
-	"github.com/itchio/go-brotli/enc"
-)
+### Bindings
 
-func brotliRoundtrip(input []byte) []byte {
-  // passing nil to get default *BrotliParams
-  // careful, q=11 is the (extremely slow) default
-  compressed, _ := enc.CompressBuffer(nil, input, make([]byte, 0))
-  decompressed, _ := dec.DecompressBuffer(compressed, make([]byte, 0))
-  return decompressed
-}
-```
+This is a very basic Cgo wrapper for the enc and dec directories from the Brotli sources.
 
-For a more complete roundtrip example, read top-level file `brotli_test.go`
+A few minor changes have been made to get things working with Go:
 
-The `enc.BrotliParams` type lets you specify various Brotli parameters, such
-as `quality`, `lgwin` (sliding window size), and `lgblock` (input block size).
-
-```go
-import (
-	"github.com/itchio/go-brotli/enc"
-)
-
-func brotliFastCompress(input []byte) []byte {
-  params := enc.NewBrotliParams()
-  // brotli supports quality values from 0 to 11 included
-  // 0 is the fastest, 11 is the most compressed but slowest
-  params.SetQuality(0)
-  compressed, _ := enc.CompressBuffer(params, input, make([]byte, 0))
-  return compressed
-}
-```
-
-Advanced usage (streaming API)
----
-
-When the data set is too large to fit in-memory, `CompressBuffer` and
-`DecompressBuffer` are not a viable option.
-
-`brotli-go` also exposes a streaming interface both for encoding:
-
-```go
-import (
-	"github.com/itchio/go-brotli/enc"
-)
-
-func main() {
-  compressedWriter,_ := os.OpenFile("data.bin.bro", os.O_CREATE|os.O_WRONLY, 0644)
-
-  brotliWriter := enc.NewBrotliWriter(nil, compressedWriter)
-  // BrotliWriter will close writer passed as argument if it implements io.Closer
-  defer brotliWriter.Close()
-
-  fileReader, _ := os.Open("data.bin")
-  defer fileReader.Close()
-
-  io.Copy(brotliWriter,fileReader)
-}
-```
-
-..and for decoding:
-
-```go
-import (
-	"github.com/itchio/go-brotli/dec"
-)
-
-func main() {
-  archiveReader, _ := os.Open("data.bin.bro")
-
-  brotliReader := dec.NewBrotliReader(archiveReader)
-  defer brotliReader.Close()
-
-  decompressedWriter,_ := os.OpenFile("data.bin.unbro", os.O_CREATE|os.O_WRONLY, 0644)
-  defer decompressedWriter.Close()
-  io.Copy(decompressedWriter, brotliReader)
-}
-```
-
-Bindings
----
-
-This is a very basic Cgo wrapper for the enc and dec directories from the Brotli sources. I've made a few minor changes to get
-things working with Go.
-
-1. The default dictionary has been extracted to a separate 'shared' package to allow linking the enc and dec cgo modules if you use both. Otherwise there are duplicate symbols, as described in the dictionary.h header files.
+1. The default dictionary has been extracted to a separate 'common' package to allow linking the enc and dec cgo modules if you use both. Otherwise there are duplicate symbols, as described in the dictionary.h header files.
 
 2. The dictionary variable name for the dec package has been modified for the same reason, to avoid linker collisions.
 
-Links
----
+### Links
 
+  * original bindings: <https://github.com/kothar/brotli-go>
+  * upstream cgo bindings (requires separate library compilation): <https://github.com/google/brotli/tree/master/go/cbrotli>
   * brotli streaming decompression written in pure go: <https://github.com/dsnet/compress>
 
-License
----
+### License
 
 Brotli and these bindings are open-sourced under the MIT License - see the LICENSE file.
