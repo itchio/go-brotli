@@ -3,7 +3,7 @@ package enc
 import (
 	"bytes"
 	"io"
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/itchio/dskompress/brotli"
@@ -46,7 +46,7 @@ func TestRoundtrip(T *testing.T) {
 	}
 
 	for _, file := range inputs {
-		input, err := ioutil.ReadFile(file)
+		input, err := os.ReadFile(file)
 		if err != nil {
 			T.Fatal(err)
 		}
@@ -85,7 +85,7 @@ func decompress(r io.Reader, T *testing.T) []byte {
 		T.Fatal(err)
 	}
 
-	out, err := ioutil.ReadAll(br)
+	out, err := io.ReadAll(br)
 	if err != nil {
 		T.Error(err)
 	}
