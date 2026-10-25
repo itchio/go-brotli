@@ -2,15 +2,13 @@
 package enc // import "github.com/itchio/go-brotli/enc"
 
 /*
-#cgo CFLAGS: -I${SRCDIR}/../include
+#cgo CFLAGS: -I${SRCDIR}/../c/include
 #cgo LDFLAGS: -lm
 
 // for memcpy
 #include <string.h>
 
 #include <brotli/encode.h>
-
-void* encodeBrotliDictionary;
 
 struct CompressStreamResult {
   size_t bytes_consumed;
@@ -46,8 +44,6 @@ import (
 	"io"
 	"runtime"
 	"unsafe"
-
-	"github.com/itchio/go-brotli/common"
 )
 
 // Errors which may be returned when encoding
@@ -55,11 +51,6 @@ var (
 	errWriterClosed = errors.New("brotli-go: Writer is closed")
 	errEncode       = errors.New("brotli-go: encode error")
 )
-
-func init() {
-	// Set up the default dictionary from the data in the shared package
-	C.encodeBrotliDictionary = unsafe.Pointer(common.GetDictionary())
-}
 
 // BrotliWriterOptions configures BrotliWriter
 type BrotliWriterOptions struct {

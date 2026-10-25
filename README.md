@@ -1,40 +1,35 @@
 # Go bindings for the Brotli compression library
 
-[![GoDoc](https://godoc.org/github.com/itchio/go-brotli?status.svg)](https://godoc.org/github.com/itchio/go-brotli)
-[![Build Status](https://travis-ci.org/itchio/go-brotli.svg)](https://travis-ci.org/itchio/go-brotli)
+[![GoDoc](https://godoc.org/github.com/itchio/go-brotli/enc?status.svg)](https://godoc.org/github.com/itchio/go-brotli/enc)
 
-This is a fork of Mike Houston's <https://github.com/kothar/brotli-go> with
-the following changes:
+This is a fork of Mike Houston's <https://github.com/kothar/brotli-go>. It
+only provides the encoder. For decompression use a pure Go decoder such as
+<https://github.com/itchio/dskompress>.
 
-  * Bumped to a more recent upstream (post-1.0.0)
-  * Removed custom dictionary support (which was removed from upstream)
-
-See <https://github.com/google/brotli> for the upstream C/C++ source, and
-the `VERSION.md` file to find out the currently vendored version.
+See <https://github.com/google/brotli> for the upstream C source, and the
+`VERSION.md` file for the currently vendored version.
 
 ### Usage
 
-Instead of including potentially-outdated examples in the README, 
-please refer to the `Examples` tests on the following godoc pages:
-
-  * Decompression: <https://godoc.org/github.com/itchio/go-brotli/dec>
-  * Compression: <https://godoc.org/github.com/itchio/go-brotli/enc>
+Instead of including potentially-outdated examples in the README,
+please refer to the `Examples` tests on the godoc page:
+<https://godoc.org/github.com/itchio/go-brotli/enc>
 
 ### Bindings
 
-This is a very basic Cgo wrapper for the enc and dec directories from the Brotli sources.
+The upstream `c/common`, `c/enc` and `c/include` directories are copied
+unmodified into `c/`. cgo only compiles C files that sit directly in the
+package directory, so `enc/` contains one `brotli_*.c` shim per upstream
+source file that `#include`s it.
 
-A few minor changes have been made to get things working with Go:
+To update the vendored version, check out the desired upstream tag and run:
 
-1. The default dictionary has been extracted to a separate 'common' package to allow linking the enc and dec cgo modules if you use both. Otherwise there are duplicate symbols, as described in the dictionary.h header files.
-
-2. The dictionary variable name for the dec package has been modified for the same reason, to avoid linker collisions.
+    ./vendor-brotli.sh path/to/google/brotli
 
 ### Links
 
   * original bindings: <https://github.com/kothar/brotli-go>
   * upstream cgo bindings (requires separate library compilation): <https://github.com/google/brotli/tree/master/go/cbrotli>
-  * brotli streaming decompression written in pure go: <https://github.com/dsnet/compress>
 
 ### License
 

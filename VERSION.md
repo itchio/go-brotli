@@ -1,6 +1,8 @@
 Brotli Version
 ---
 
-Vendored Brotli implementation from https://github.com/google/brotli
+Vendored Brotli encoder from https://github.com/google/brotli
 
-Current upstream commit: `da254cffdb160bd6ac1cd6ea01944099978cbb71`
+Upstream version: `v1.2.1`
+
+Upstream commit: `db24a98aed38a16de78cc05ca15cdd8dc2a0d92d`
